@@ -3,6 +3,7 @@ package com.wiley.spoonacular.service;
 import com.spoonacular.RecipesApi;
 import com.spoonacular.client.ApiClient;
 import com.spoonacular.client.ApiException;
+import com.spoonacular.client.model.RecipeInformation;
 import com.spoonacular.client.model.SearchRecipes200Response;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -141,6 +142,25 @@ public class SpoonacularApiService {
                 null,       // maxZinc
                 0,          // offset
                 resultSize      // number of results
+        );
+    }
+
+    /**
+     * Get detailed information about a specific recipe.
+     * 
+     * @param id The recipe ID
+     * @param includeNutrition Whether to include nutrition data (default false)
+     * @return Detailed recipe information
+     * @throws ApiException if the API call fails
+     */
+    public RecipeInformation getRecipeInformation(Integer id, Boolean includeNutrition) throws ApiException {
+        final Boolean includeNutritionData = (includeNutrition == null) ? false : includeNutrition;
+        
+        return getRecipesApi().getRecipeInformation(
+                id,
+                includeNutritionData,
+                null,  // addWinePairing
+                null   // addTasteData
         );
     }
 }

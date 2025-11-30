@@ -1,6 +1,7 @@
 package com.wiley.spoonacular.controller;
 
 import com.spoonacular.client.ApiException;
+import com.spoonacular.client.model.RecipeInformation;
 import com.spoonacular.client.model.SearchRecipes200Response;
 import com.wiley.spoonacular.service.SpoonacularApiService;
 import org.springframework.http.HttpStatus;
@@ -19,7 +20,7 @@ public class RecipesServiceController {
 
     /**
      * Search for recipes by query.
-     * Example: GET /api/recipes/search?query=pasta&number=5
+     * Example: GET /recipes/search?query=pasta&number=5
      * 
      * @param query Search term (e.g., "pasta", "chicken", "salad")
      * @param maxResultSize Maximum number of results to return (default: 10, max: 100)
@@ -35,6 +36,27 @@ public class RecipesServiceController {
         } catch (ApiException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Error searching recipes: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Get detailed information about a specific recipe.
+     * Example: GET /recipes/{id}?includeNutrition=true
+     * 
+     * @param id The recipe ID
+     * @param includeNutrition Whether to include nutrition data (default: false)
+     * @return JSON response with detailed recipe information
+     */
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getRecipeInformation(
+            @PathVariable Integer id,
+            @RequestParam(required = false, defaultValue = "false") Boolean includeNutrition) {
+        try {
+            RecipeInformation recipeInfo = spoonacularApiService.getRecipeInformation(id, includeNutrition);
+            return ResponseEntity.ok(recipeInfo);
+        } catch (ApiException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error getting recipe information: " + e.getMessage());
         }
     }
 }
