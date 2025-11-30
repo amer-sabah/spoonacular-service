@@ -1,0 +1,11 @@
+# Maven / target
+/target/
+
+# IDEs
+.idea/
+*.iml
+/.vscode/
+
+# OS
+Thumbs.db
+.DS_Store
