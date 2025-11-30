@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
  * Service for searching recipes using the Spoonacular API SDK.
  */
 @Service
-public class SpoonacularApiService {
+public class RecipesApiService {
 
     @Value("${spoonacular.api.key}")
     private String apiKey;

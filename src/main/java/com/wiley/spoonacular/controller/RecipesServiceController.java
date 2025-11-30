@@ -3,7 +3,7 @@ package com.wiley.spoonacular.controller;
 import com.spoonacular.client.ApiException;
 import com.spoonacular.client.model.RecipeInformation;
 import com.spoonacular.client.model.SearchRecipes200Response;
-import com.wiley.spoonacular.service.SpoonacularApiService;
+import com.wiley.spoonacular.service.RecipesApiService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,10 +12,10 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/recipes")
 public class RecipesServiceController {
 
-    private final SpoonacularApiService spoonacularApiService;
+    private final RecipesApiService recipesApiService;
 
-    public RecipesServiceController(SpoonacularApiService spoonacularApiService) {
-        this.spoonacularApiService = spoonacularApiService;
+    public RecipesServiceController(RecipesApiService recipesApiService) {
+        this.recipesApiService = recipesApiService;
     }
 
     /**
@@ -31,7 +31,7 @@ public class RecipesServiceController {
             @RequestParam String query,
             @RequestParam(required = false, defaultValue = "10") Integer maxResultSize) {
         try {
-            SearchRecipes200Response response = spoonacularApiService.searchRecipes(query, maxResultSize);
+            SearchRecipes200Response response = recipesApiService.searchRecipes(query, maxResultSize);
             return ResponseEntity.ok(response);
         } catch (ApiException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -52,7 +52,7 @@ public class RecipesServiceController {
             @PathVariable Integer id,
             @RequestParam(required = false, defaultValue = "false") Boolean includeNutrition) {
         try {
-            RecipeInformation recipeInfo = spoonacularApiService.getRecipeInformation(id, includeNutrition);
+            RecipeInformation recipeInfo = recipesApiService.getRecipeInformation(id, includeNutrition);
             return ResponseEntity.ok(recipeInfo);
         } catch (ApiException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)

@@ -10,26 +10,26 @@ import org.springframework.test.util.ReflectionTestUtils;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Unit tests for SpoonacularApiService.
+ * Unit tests for RecipesApiService.
  * Note: These are basic validation tests. Full API integration tests
  * would require a valid API key and network connectivity.
  */
-class SpoonacularApiServiceTest {
+class RecipesApiServiceTest {
 
-    private SpoonacularApiService spoonacularApiService;
+    private RecipesApiService recipesApiService;
 
     private static final String TEST_API_KEY = "dd78c2d7cff44edba09aaebf9f697sss";
 
     @BeforeEach
     void setUp() {
-        spoonacularApiService = new SpoonacularApiService();
-        ReflectionTestUtils.setField(spoonacularApiService, "apiKey", TEST_API_KEY);
+        recipesApiService = new RecipesApiService();
+        ReflectionTestUtils.setField(recipesApiService, "apiKey", TEST_API_KEY);
     }
 
     @Test
     void testServiceInitialization() {
-        assertNotNull(spoonacularApiService);
-        String apiKey = (String) ReflectionTestUtils.getField(spoonacularApiService, "apiKey");
+        assertNotNull(recipesApiService);
+        String apiKey = (String) ReflectionTestUtils.getField(recipesApiService, "apiKey");
         assertEquals(TEST_API_KEY, apiKey);
     }
 
@@ -38,7 +38,7 @@ class SpoonacularApiServiceTest {
         // This test verifies that the service handles null maxResultSize parameter
         // by defaulting to 10 results
         try {
-            SearchRecipes200Response response = spoonacularApiService.searchRecipes("pasta", null);
+            SearchRecipes200Response response = recipesApiService.searchRecipes("pasta", null);
             assertNotNull(response, "Response should not be null");
             // If we get here, the default parameter logic worked
         } catch (ApiException e) {
@@ -55,7 +55,7 @@ class SpoonacularApiServiceTest {
         // and returns the requested number of results
         try {
             int requestedSize = 5;
-            SearchRecipes200Response response = spoonacularApiService.searchRecipes("pasta", requestedSize);
+            SearchRecipes200Response response = recipesApiService.searchRecipes("pasta", requestedSize);
             assertNotNull(response, "Response should not be null");
             // Verify response structure
             assertNotNull(response.getResults(), "Results should not be null");
@@ -74,7 +74,7 @@ class SpoonacularApiServiceTest {
         // Verify that calling with a query doesn't throw unexpected exceptions
         assertDoesNotThrow(() -> {
             try {
-                SearchRecipes200Response response = spoonacularApiService.searchRecipes("chicken", 10);
+                SearchRecipes200Response response = recipesApiService.searchRecipes("chicken", 10);
                 if (response != null) {
                     assertNotNull(response.getResults());
                 }
@@ -88,7 +88,7 @@ class SpoonacularApiServiceTest {
     @Test
     void testApiKeyIsSet() {
         // Verify that API key is properly set
-        String apiKey = (String) ReflectionTestUtils.getField(spoonacularApiService, "apiKey");
+        String apiKey = (String) ReflectionTestUtils.getField(recipesApiService, "apiKey");
         assertNotNull(apiKey, "API key should be set");
         assertFalse(apiKey.isEmpty(), "API key should not be empty");
     }
@@ -98,7 +98,7 @@ class SpoonacularApiServiceTest {
         // Verify that calling getRecipeInformation with a valid ID doesn't throw unexpected exceptions
         assertDoesNotThrow(() -> {
             try {
-                RecipeInformation recipeInfo = spoonacularApiService.getRecipeInformation(715538, false);
+                RecipeInformation recipeInfo = recipesApiService.getRecipeInformation(715538, false);
                 if (recipeInfo != null) {
                     assertNotNull(recipeInfo.getId(), "Recipe ID should not be null");
                     assertNotNull(recipeInfo.getTitle(), "Recipe title should not be null");
@@ -115,7 +115,7 @@ class SpoonacularApiServiceTest {
         // This test verifies that the service handles null includeNutrition parameter
         // by defaulting to false
         try {
-            RecipeInformation recipeInfo = spoonacularApiService.getRecipeInformation(715538, null);
+            RecipeInformation recipeInfo = recipesApiService.getRecipeInformation(715538, null);
             assertNotNull(recipeInfo, "Response should not be null");
             // If we get here, the default parameter logic worked
         } catch (ApiException e) {
@@ -130,7 +130,7 @@ class SpoonacularApiServiceTest {
     void testGetRecipeInformation_WithNutrition() throws ApiException {
         // This test verifies that the service accepts includeNutrition parameter
         try {
-            RecipeInformation recipeInfo = spoonacularApiService.getRecipeInformation(715538, true);
+            RecipeInformation recipeInfo = recipesApiService.getRecipeInformation(715538, true);
             assertNotNull(recipeInfo, "Response should not be null");
             // Verify response structure
             assertNotNull(recipeInfo.getId(), "Recipe ID should not be null");
