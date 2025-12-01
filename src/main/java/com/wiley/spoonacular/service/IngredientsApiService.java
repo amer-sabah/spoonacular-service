@@ -2,11 +2,13 @@ package com.wiley.spoonacular.service;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 import com.spoonacular.IngredientsApi;
 import com.spoonacular.client.ApiClient;
 import com.spoonacular.client.ApiException;
 import com.spoonacular.client.JSON;
 import com.spoonacular.client.model.IngredientInformation;
+import com.wiley.spoonacular.cache.JsonFileCache;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +25,17 @@ public class IngredientsApiService {
     private String apiKey;
 
     private IngredientsApi ingredientsApi;
+    private JsonFileCache<IngredientInformation> ingredientInfoCache;
+
+    /**
+     * Initialize cache on first access.
+     */
+    private void initializeCache() {
+        if (ingredientInfoCache == null) {
+            ingredientInfoCache = new JsonFileCache<>("ingredients/info", 
+                new TypeToken<IngredientInformation>(){}.getType(), 24, 100);
+        }
+    }
 
     /**
      * Initialize the Spoonacular API client with custom Gson configuration
@@ -64,10 +77,24 @@ public class IngredientsApiService {
      * @throws ApiException if the API call fails
      */
     public IngredientInformation getIngredientInformation(Integer id, BigDecimal amount, String unit) throws ApiException {
-        return getIngredientsApi().getIngredientInformation(
+        // Initialize cache if needed
+        initializeCache();
+        
+        // Check cache first
+        String cacheKey = ingredientInfoCache.generateCacheKey(id, amount, unit);
+        IngredientInformation cachedResult = ingredientInfoCache.get(cacheKey);
+        if (cachedResult != null) {
+            return cachedResult;
+        }
+        
+        IngredientInformation response = getIngredientsApi().getIngredientInformation(
                 id,
                 amount,
                 unit
         );
+        
+        // Cache the response
+        ingredientInfoCache.put(cacheKey, response);
+        return response;
     }
 }

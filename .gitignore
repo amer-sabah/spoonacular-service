@@ -1,6 +1,9 @@
 # Maven / target
 /target/
 
+# Cache
+/cache/
+
 # IDEs
 .idea/
 *.iml
