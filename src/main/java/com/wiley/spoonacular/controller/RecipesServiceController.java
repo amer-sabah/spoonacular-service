@@ -21,17 +21,22 @@ public class RecipesServiceController {
     /**
      * Search for recipes by query.
      * Example: GET /recipes/search?query=pasta&number=5
+     * Example with cuisines: GET /recipes/search?query=pasta&cuisines=Italian,Mexican
      * 
      * @param query Search term (e.g., "pasta", "chicken", "salad")
      * @param maxResultSize Maximum number of results to return (default: 10, max: 100)
+     * @param cuisines Optional list of cuisines to filter by (e.g., Italian, Mexican, Chinese)
+     * @param maxCalories Optional maximum calories per serving
      * @return JSON response with recipe search results
      */
     @GetMapping("/search")
     public ResponseEntity<?> searchRecipes(
             @RequestParam String query,
-            @RequestParam(required = false, defaultValue = "10") Integer maxResultSize) {
+            @RequestParam(required = false, defaultValue = "12") Integer maxResultSize,
+            @RequestParam(required = false) java.util.List<String> cuisines,
+            @RequestParam(required = false) Integer maxCalories) {
         try {
-            SearchRecipes200Response response = recipesApiService.searchRecipes(query, maxResultSize);
+            SearchRecipes200Response response = recipesApiService.searchRecipes(query, maxResultSize, cuisines, maxCalories);
             return ResponseEntity.ok(response);
         } catch (ApiException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)

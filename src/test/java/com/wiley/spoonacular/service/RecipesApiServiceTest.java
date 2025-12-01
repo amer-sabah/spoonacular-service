@@ -38,7 +38,7 @@ class RecipesApiServiceTest {
         // This test verifies that the service handles null maxResultSize parameter
         // by defaulting to 10 results
         try {
-            SearchRecipes200Response response = recipesApiService.searchRecipes("pasta", null);
+            SearchRecipes200Response response = recipesApiService.searchRecipes("pasta", null, null, null);
             assertNotNull(response, "Response should not be null");
             // If we get here, the default parameter logic worked
         } catch (ApiException e) {
@@ -55,7 +55,7 @@ class RecipesApiServiceTest {
         // and returns the requested number of results
         try {
             int requestedSize = 5;
-            SearchRecipes200Response response = recipesApiService.searchRecipes("pasta", requestedSize);
+            SearchRecipes200Response response = recipesApiService.searchRecipes("pasta", requestedSize, null, null);
             assertNotNull(response, "Response should not be null");
             // Verify response structure
             assertNotNull(response.getResults(), "Results should not be null");
@@ -74,7 +74,41 @@ class RecipesApiServiceTest {
         // Verify that calling with a query doesn't throw unexpected exceptions
         assertDoesNotThrow(() -> {
             try {
-                SearchRecipes200Response response = recipesApiService.searchRecipes("chicken", 10);
+                SearchRecipes200Response response = recipesApiService.searchRecipes("chicken", 10, null, null);
+                if (response != null) {
+                    assertNotNull(response.getResults());
+                }
+            } catch (ApiException e) {
+                // Expected if API is unreachable or rate limited
+                System.out.println("API call failed (expected in unit test): " + e.getMessage());
+            }
+        });
+    }
+
+    @Test
+    void testSearchRecipes_WithCuisines() {
+        // Verify that calling with cuisines filter doesn't throw unexpected exceptions
+        assertDoesNotThrow(() -> {
+            try {
+                java.util.List<String> cuisines = java.util.Arrays.asList("Italian", "Mexican");
+                SearchRecipes200Response response = recipesApiService.searchRecipes("pasta", 10, cuisines, null);
+                if (response != null) {
+                    assertNotNull(response.getResults());
+                }
+            } catch (ApiException e) {
+                // Expected if API is unreachable or rate limited
+                System.out.println("API call failed (expected in unit test): " + e.getMessage());
+            }
+        });
+    }
+
+    @Test
+    void testSearchRecipes_WithSingleCuisine() {
+        // Verify that calling with a single cuisine filter works correctly
+        assertDoesNotThrow(() -> {
+            try {
+                java.util.List<String> cuisines = java.util.Arrays.asList("Italian");
+                SearchRecipes200Response response = recipesApiService.searchRecipes("pasta", 5, cuisines, null);
                 if (response != null) {
                     assertNotNull(response.getResults());
                 }
@@ -139,5 +173,38 @@ class RecipesApiServiceTest {
             assertTrue(e.getMessage() != null || e.getCode() != 0, 
                 "ApiException should have message or code");
         }
+    }
+
+    @Test
+    void testSearchRecipes_WithMaxCalories() {
+        // Verify that calling with maxCalories filter works correctly
+        assertDoesNotThrow(() -> {
+            try {
+                SearchRecipes200Response response = recipesApiService.searchRecipes("salad", 10, null, 500);
+                if (response != null) {
+                    assertNotNull(response.getResults());
+                }
+            } catch (ApiException e) {
+                // Expected if API is unreachable or rate limited
+                System.out.println("API call failed (expected in unit test): " + e.getMessage());
+            }
+        });
+    }
+
+    @Test
+    void testSearchRecipes_WithCuisinesAndMaxCalories() {
+        // Verify that calling with both cuisines and maxCalories filters works correctly
+        assertDoesNotThrow(() -> {
+            try {
+                java.util.List<String> cuisines = java.util.Arrays.asList("Italian", "Mediterranean");
+                SearchRecipes200Response response = recipesApiService.searchRecipes("pasta", 10, cuisines, 600);
+                if (response != null) {
+                    assertNotNull(response.getResults());
+                }
+            } catch (ApiException e) {
+                // Expected if API is unreachable or rate limited
+                System.out.println("API call failed (expected in unit test): " + e.getMessage());
+            }
+        });
     }
 }

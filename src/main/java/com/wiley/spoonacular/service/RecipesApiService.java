@@ -77,17 +77,29 @@ public class RecipesApiService {
      * 
      * @param query The search query (e.g., "pasta", "chicken")
      * @param maxResultSize Maximum number of results to return (default 10)
+     * @param cuisines Optional list of cuisines to filter by (e.g., ["Italian", "Mexican"])
+     * @param maxCalories Optional maximum calories per serving
      * @return Search results containing recipe information
      * @throws ApiException if the API call fails
      */
-    public SearchRecipes200Response searchRecipes(String query, Integer maxResultSize) throws ApiException {
+    public SearchRecipes200Response searchRecipes(String query, Integer maxResultSize, java.util.List<String> cuisines, Integer maxCalories) throws ApiException {
         final Integer resultSize = (maxResultSize == null) ? 10 : maxResultSize;
         
         // Initialize caches if needed
         initializeCaches();
         
+        // Convert cuisines list to comma-separated string for API
+        String cuisineString = (cuisines != null && !cuisines.isEmpty()) 
+            ? String.join(",", cuisines) 
+            : null;
+        
+        // Convert maxCalories to BigDecimal for API
+        java.math.BigDecimal maxCaloriesBD = (maxCalories != null) 
+            ? java.math.BigDecimal.valueOf(maxCalories) 
+            : null;
+        
         // Check cache first
-        String cacheKey = searchCache.generateCacheKey(query, resultSize);
+        String cacheKey = searchCache.generateCacheKey(query, resultSize, cuisineString, maxCalories);
         SearchRecipes200Response cachedResult = searchCache.get(cacheKey);
         if (cachedResult != null) {
             return cachedResult;
@@ -96,8 +108,8 @@ public class RecipesApiService {
         // Search recipes with query and number of results
         // All other parameters set to null for simplicity
         SearchRecipes200Response response = getRecipesApi().searchRecipes(
-                query,      // query - what to search for
-                null,       // cuisine
+                query,          // query - what to search for
+                cuisineString,  // cuisine - comma-separated list of cuisines
                 null,       // excludeCuisine
                 null,       // diet
                 null,       // intolerances
@@ -124,7 +136,7 @@ public class RecipesApiService {
                 null,       // minProtein
                 null,       // maxProtein
                 null,       // minCalories
-                null,       // maxCalories
+                maxCaloriesBD,       // maxCalories
                 null,       // minFat
                 null,       // maxFat
                 null,       // minAlcohol
