@@ -1,12 +1,17 @@
 package com.wiley.spoonacular.service;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.spoonacular.RecipesApi;
 import com.spoonacular.client.ApiClient;
 import com.spoonacular.client.ApiException;
+import com.spoonacular.client.JSON;
 import com.spoonacular.client.model.RecipeInformation;
 import com.spoonacular.client.model.SearchRecipes200Response;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+
+import java.lang.reflect.Field;
 
 /**
  * Service for searching recipes using the Spoonacular API SDK.
@@ -20,12 +25,30 @@ public class RecipesApiService {
     private RecipesApi recipesApi;
 
     /**
-     * Initialize the Spoonacular API client.
+     * Initialize the Spoonacular API client with custom Gson configuration
+     * to ignore unknown fields from API responses.
      */
     private RecipesApi getRecipesApi() {
         if (recipesApi == null) {
             ApiClient apiClient = new ApiClient();
             apiClient.setApiKey(apiKey);
+            
+            // Configure Gson to be lenient and ignore unknown fields
+            try {
+                JSON json = apiClient.getJSON();
+                Gson customGson = new GsonBuilder()
+                        .setLenient()
+                        .create();
+                
+                // Use reflection to replace the Gson instance in JSON object
+                Field gsonField = JSON.class.getDeclaredField("gson");
+                gsonField.setAccessible(true);
+                gsonField.set(json, customGson);
+            } catch (Exception e) {
+                // If reflection fails, log warning but continue with default configuration
+                System.err.println("Warning: Could not configure custom Gson: " + e.getMessage());
+            }
+            
             recipesApi = new RecipesApi(apiClient);
         }
         return recipesApi;
