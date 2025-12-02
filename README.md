@@ -14,7 +14,7 @@ A Spring Boot RESTful backend application for the Spoonacular service.
 
 Before building the application, you need to install the `spoonacular-api-clients` dependency locally:
 
-1. Clone or download the spoonacular-api-clients library
+1. Clone or download the spoonacular-api-clients library from [https://github.com/ddsky/spoonacular-api-clients](https://github.com/ddsky/spoonacular-api-clients)
 2. Navigate to the spoonacular-api-clients directory
 3. Run Maven install:
 
