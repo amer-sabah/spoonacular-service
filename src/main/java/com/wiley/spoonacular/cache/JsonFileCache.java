@@ -180,21 +180,31 @@ public class JsonFileCache<T> {
                 // If we're at or over the limit, delete oldest files
                 int toDelete = fileTimestamps.size() - maxEntries + 1; // +1 for the new entry we're about to add
                 if (toDelete > 0) {
-                    fileTimestamps.entrySet().stream()
-                        .sorted(Comparator.comparingLong(Map.Entry::getValue))
-                        .limit(toDelete)
-                        .forEach(entry -> {
-                            try {
-                                Files.delete(entry.getKey());
-                            } catch (IOException e) {
-                                System.err.println("Warning: Could not delete old cache file: " + e.getMessage());
-                            }
-                        });
+                    deleteOldestFiles(fileTimestamps, toDelete);
                 }
             }
         } catch (IOException e) {
             System.err.println("Warning: Could not enforce cache size limit: " + e.getMessage());
         }
+    }
+
+    /**
+     * Delete the oldest cache files based on their timestamps.
+     * 
+     * @param fileTimestamps Map of file paths to their last modified timestamps
+     * @param count Number of files to delete
+     */
+    private void deleteOldestFiles(Map<Path, Long> fileTimestamps, int count) {
+        fileTimestamps.entrySet().stream()
+            .sorted(Comparator.comparingLong(Map.Entry::getValue))
+            .limit(count)
+            .forEach(entry -> {
+                try {
+                    Files.delete(entry.getKey());
+                } catch (IOException e) {
+                    System.err.println("Warning: Could not delete old cache file: " + e.getMessage());
+                }
+            });
     }
 
     /**
