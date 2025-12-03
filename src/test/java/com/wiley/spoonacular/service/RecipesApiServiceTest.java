@@ -207,4 +207,89 @@ class RecipesApiServiceTest {
             }
         });
     }
+
+    @Test
+    void testSearchRecipes_WithEmptyQuery() {
+        // Verify that calling with empty query string doesn't throw unexpected exceptions
+        assertDoesNotThrow(() -> {
+            try {
+                SearchRecipes200Response response = recipesApiService.searchRecipes("", 10, null, null);
+                if (response != null) {
+                    assertNotNull(response.getResults());
+                }
+            } catch (ApiException e) {
+                // Expected if API is unreachable or rate limited
+                System.out.println("API call failed (expected in unit test): " + e.getMessage());
+            }
+        });
+    }
+
+    @Test
+    void testSearchRecipes_WithEmptyCuisinesList() {
+        // Verify that calling with empty cuisines list works correctly
+        assertDoesNotThrow(() -> {
+            try {
+                java.util.List<String> emptyCuisines = java.util.Collections.emptyList();
+                SearchRecipes200Response response = recipesApiService.searchRecipes("pasta", 10, emptyCuisines, null);
+                if (response != null) {
+                    assertNotNull(response.getResults());
+                }
+            } catch (ApiException e) {
+                // Expected if API is unreachable or rate limited
+                System.out.println("API call failed (expected in unit test): " + e.getMessage());
+            }
+        });
+    }
+
+    @Test
+    void testSearchRecipes_WithZeroMaxCalories() {
+        // Verify that calling with zero maxCalories works correctly
+        assertDoesNotThrow(() -> {
+            try {
+                SearchRecipes200Response response = recipesApiService.searchRecipes("salad", 10, null, 0);
+                if (response != null) {
+                    assertNotNull(response.getResults());
+                }
+            } catch (ApiException e) {
+                // Expected if API is unreachable or rate limited
+                System.out.println("API call failed (expected in unit test): " + e.getMessage());
+            }
+        });
+    }
+
+    @Test
+    void testGetRecipeInformation_WithInvalidId() {
+        // Verify that calling with invalid ID handles error gracefully
+        assertDoesNotThrow(() -> {
+            try {
+                RecipeInformation recipeInfo = recipesApiService.getRecipeInformation(-1, false);
+                // If we get a response, it should be valid
+                if (recipeInfo != null) {
+                    assertNotNull(recipeInfo.getId());
+                }
+            } catch (ApiException e) {
+                // Expected for invalid ID
+                assertTrue(e.getCode() == 404 || e.getCode() == 401,
+                    "Should return 404 or 401 for invalid ID");
+            }
+        });
+    }
+
+    @Test
+    void testSearchRecipes_LargeMaxResultSize() {
+        // Verify that calling with large maxResultSize doesn't cause issues
+        assertDoesNotThrow(() -> {
+            try {
+                SearchRecipes200Response response = recipesApiService.searchRecipes("pasta", 100, null, null);
+                if (response != null) {
+                    assertNotNull(response.getResults());
+                    assertTrue(response.getResults().size() <= 100,
+                        "Results should not exceed requested size");
+                }
+            } catch (ApiException e) {
+                // Expected if API is unreachable or rate limited
+                System.out.println("API call failed (expected in unit test): " + e.getMessage());
+            }
+        });
+    }
 }

@@ -133,4 +133,61 @@ class JsonFileCacheTest {
         cache.put(key1, "Test data with null param");
         assertEquals("Test data with null param", cache.get(key2));
     }
+
+    @Test
+    void testCacheExpiration() throws InterruptedException {
+        // Create a cache with 1 second TTL
+        JsonFileCache<String> shortLivedCache = new JsonFileCache<>("test-ttl",
+                new TypeToken<String>(){}.getType(), 0, 100); // 0 hours = expired immediately
+        
+        try {
+            String cacheKey = shortLivedCache.generateCacheKey("test", "expiration");
+            shortLivedCache.put(cacheKey, "Expiring data");
+            
+            // Small delay to ensure expiration
+            Thread.sleep(100);
+            
+            // Data should be expired and return null
+            String cachedData = shortLivedCache.get(cacheKey);
+            assertNull(cachedData, "Expired cache entry should return null");
+        } finally {
+            shortLivedCache.clear();
+            File cacheDir = new File("cache/test-ttl");
+            if (cacheDir.exists()) {
+                cacheDir.delete();
+            }
+        }
+    }
+
+    @Test
+    void testEmptyStringCacheKey() {
+        String key = cache.generateCacheKey("");
+        assertNotNull(key, "Cache key should be generated for empty string");
+        assertFalse(key.isEmpty(), "Generated cache key should not be empty");
+        
+        cache.put(key, "Data for empty key");
+        assertEquals("Data for empty key", cache.get(key));
+    }
+
+    @Test
+    void testCacheKeyWithSpecialCharacters() {
+        String key1 = cache.generateCacheKey("query with spaces", "param@#$%");
+        String key2 = cache.generateCacheKey("query with spaces", "param@#$%");
+        
+        assertEquals(key1, key2, "Same parameters with special characters should generate same key");
+        
+        cache.put(key1, "Special chars data");
+        assertEquals("Special chars data", cache.get(key2));
+    }
+
+    @Test
+    void testMultiplePutsOverwritesPreviousData() {
+        String cacheKey = cache.generateCacheKey("overwrite", "test");
+        
+        cache.put(cacheKey, "First data");
+        assertEquals("First data", cache.get(cacheKey));
+        
+        cache.put(cacheKey, "Second data");
+        assertEquals("Second data", cache.get(cacheKey), "Second put should overwrite first data");
+    }
 }

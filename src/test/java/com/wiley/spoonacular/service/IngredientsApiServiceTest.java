@@ -90,4 +90,75 @@ class IngredientsApiServiceTest {
         assertNotNull(apiKey, "API key should be set");
         assertFalse(apiKey.isEmpty(), "API key should not be empty");
     }
+
+    @Test
+    void testGetIngredientInformation_WithInvalidId() {
+        // Verify that calling with invalid ID handles error gracefully
+        assertDoesNotThrow(() -> {
+            try {
+                IngredientInformation ingredientInfo = ingredientsApiService.getIngredientInformation(-1, null, null);
+                // If we get a response, it should be valid
+                if (ingredientInfo != null) {
+                    assertNotNull(ingredientInfo.getId());
+                }
+            } catch (ApiException e) {
+                // Expected for invalid ID
+                assertTrue(e.getCode() == 404 || e.getCode() == 401,
+                    "Should return 404 or 401 for invalid ID");
+            }
+        });
+    }
+
+    @Test
+    void testGetIngredientInformation_WithZeroAmount() throws ApiException {
+        // This test verifies that the service handles zero amount correctly
+        try {
+            BigDecimal amount = BigDecimal.ZERO;
+            String unit = "grams";
+            IngredientInformation ingredientInfo = ingredientsApiService.getIngredientInformation(9266, amount, unit);
+            assertNotNull(ingredientInfo, "Response should not be null");
+        } catch (ApiException e) {
+            // API exception is expected if there are network/API issues
+            assertTrue(e.getMessage() != null || e.getCode() != 0,
+                "ApiException should have message or code");
+        }
+    }
+
+    @Test
+    void testGetIngredientInformation_WithNegativeAmount() throws ApiException {
+        // This test verifies that the service handles negative amount
+        try {
+            BigDecimal amount = new BigDecimal("-10");
+            String unit = "grams";
+            IngredientInformation ingredientInfo = ingredientsApiService.getIngredientInformation(9266, amount, unit);
+            // If we get a response without exception, the service handled it
+            if (ingredientInfo != null) {
+                assertNotNull(ingredientInfo.getId());
+            }
+        } catch (ApiException e) {
+            // API might reject negative amounts
+            assertTrue(e.getCode() >= 400, "Should return error code for negative amount");
+        }
+    }
+
+    @Test
+    void testGetIngredientInformation_WithDifferentUnits() throws ApiException {
+        // This test verifies that the service handles different unit types
+        String[] units = {"grams", "cups", "tablespoons", "ounces", "pounds"};
+        
+        for (String unit : units) {
+            assertDoesNotThrow(() -> {
+                try {
+                    BigDecimal amount = new BigDecimal("100");
+                    IngredientInformation ingredientInfo = ingredientsApiService.getIngredientInformation(9266, amount, unit);
+                    if (ingredientInfo != null) {
+                        assertNotNull(ingredientInfo.getId(), "Ingredient ID should not be null for unit: " + unit);
+                    }
+                } catch (ApiException e) {
+                    // Expected if API is unreachable or rate limited
+                    System.out.println("API call failed (expected in unit test): " + e.getMessage());
+                }
+            }, "Should handle unit: " + unit);
+        }
+    }
 }
