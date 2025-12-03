@@ -1,20 +1,17 @@
 package com.wiley.spoonacular.service;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import com.spoonacular.IngredientsApi;
 import com.spoonacular.client.ApiClient;
 import com.spoonacular.client.ApiException;
-import com.spoonacular.client.JSON;
 import com.spoonacular.client.model.IngredientInformation;
 import com.wiley.spoonacular.cache.JsonFileCache;
+import com.wiley.spoonacular.util.ApiClientConfigurer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.lang.reflect.Field;
 import java.math.BigDecimal;
 
 /**
@@ -51,20 +48,7 @@ public class IngredientsApiService {
             apiClient.setApiKey(apiKey);
             
             // Configure Gson to be lenient and ignore unknown fields
-            try {
-                JSON json = apiClient.getJSON();
-                Gson customGson = new GsonBuilder()
-                        .setLenient()
-                        .create();
-                
-                // Use reflection to replace the Gson instance in JSON object
-                Field gsonField = JSON.class.getDeclaredField("gson");
-                gsonField.setAccessible(true);
-                gsonField.set(json, customGson);
-            } catch (Exception e) {
-                // If reflection fails, log warning but continue with default configuration
-                logger.warn("Could not configure custom Gson: {}", e.getMessage(), e);
-            }
+            ApiClientConfigurer.configureGson(apiClient);
             
             ingredientsApi = new IngredientsApi(apiClient);
         }
