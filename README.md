@@ -75,6 +75,30 @@ The application implements a JSON file-based caching system to optimize API usag
 
 For detailed information about the caching implementation, see [CACHE_README.md](CACHE_README.md).
 
+## Design Decisions
+
+### Local Cache Implementation
+
+**Decision:** Implement a local cache to enhance performance.
+
+**Rationale:** By storing frequently accessed data in memory, the local cache minimizes repetitive database queries and API calls, which can be time-consuming and resource-intensive.
+
+**Benefits:**
+- **Improved Performance:** Reduces latency by delivering data faster to users.
+- **Reduced Database Load:** Eases pressure on the database during peak loads, preventing potential bottlenecks.
+- **Cost Efficiency:** Lower API call volumes can translate to reduced costs associated with third-party services, particularly those that charge based on usage.
+
+### Use of API Client Java SDK
+
+**Decision:** Opted for the API Client Java SDK instead of using a Spring template.
+
+**Rationale:** The Java SDK is specifically designed for the API, allowing more straightforward integration and reducing the complexity of code required to interact with the API.
+
+**Benefits:**
+- **Simplified Development:** Provides built-in functions and abstractions tailored to API calls, decreasing the need for extensive boilerplate code.
+- **Enhanced Maintainability:** Abstracts the complexities of API interactions, making it easier for future developers to understand and manage the codebase.
+- **Cost Management:** By utilizing the SDK effectively, the application can implement caching strategies that reduce the frequency of API calls, thus adhering to usage limits and minimizing costs.
+
 ## API Endpoints
 
 The application provides the following REST API endpoints:
