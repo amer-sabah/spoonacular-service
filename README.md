@@ -179,46 +179,51 @@ SpoonacularBackend/
 ├── pom.xml
 ├── README.md
 ├── CACHE_README.md
-├── cache/
+├── .gitignore
+├── cache/                              # JSON file-based cache storage
 │   ├── ingredients/
-│   │   └── info/
+│   │   └── info/                       # Cached ingredient information
 │   └── recipes/
-│       ├── info/
-│       └── search/
+│       ├── info/                       # Cached recipe details
+│       └── search/                     # Cached recipe search results
 ├── src/
 │   ├── main/
 │   │   ├── java/
 │   │   │   └── com/
 │   │   │       └── wiley/
 │   │   │           └── spoonacular/
-│   │   │               ├── SpoonacularServiceApplication.java
+│   │   │               ├── SpoonacularServiceApplication.java    # Main application entry point
 │   │   │               ├── cache/
-│   │   │               │   └── JsonFileCache.java
+│   │   │               │   ├── CacheEntry.java                   # Cache entry model with timestamp
+│   │   │               │   └── JsonFileCache.java                # Generic JSON file cache manager
 │   │   │               ├── config/
-│   │   │               │   └── CorsConfig.java
+│   │   │               │   └── CorsConfig.java                   # CORS configuration
 │   │   │               ├── controller/
-│   │   │               │   ├── IngredientsServiceController.java
-│   │   │               │   ├── RecipesServiceController.java
-│   │   │               │   └── SpoonacularServiceController.java
-│   │   │               └── service/
-│   │   │                   ├── IngredientsApiService.java
-│   │   │                   └── RecipesApiService.java
+│   │   │               │   ├── IngredientsServiceController.java # Ingredients API endpoints
+│   │   │               │   └── RecipesServiceController.java     # Recipes API endpoints
+│   │   │               ├── service/
+│   │   │               │   ├── IngredientsApiService.java        # Ingredients business logic
+│   │   │               │   └── RecipesApiService.java            # Recipes business logic
+│   │   │               └── util/
+│   │   │                   └── ApiClientConfigurer.java          # Gson configuration utility
 │   │   └── resources/
-│   │       └── application.properties
+│   │       └── application.properties                            # Application configuration
 │   └── test/
 │       └── java/
 │           └── com/
 │               └── wiley/
 │                   └── spoonacular/
 │                       ├── cache/
-│                       │   └── JsonFileCacheTest.java
-│                       └── service/
-│                           ├── IngredientsApiServiceTest.java
-│                           └── RecipesApiServiceTest.java
-└── target/
-    ├── classes/
-    ├── test-classes/
-    └── surefire-reports/
+│                       │   └── JsonFileCacheTest.java            # Cache functionality tests (10 tests)
+│                       ├── service/
+│                       │   ├── IngredientsApiServiceTest.java    # Ingredients service tests (9 tests)
+│                       │   └── RecipesApiServiceTest.java        # Recipes service tests (17 tests)
+│                       └── util/
+│                           └── ApiClientConfigurerTest.java      # Utility class tests (6 tests)
+└── target/                             # Maven build output
+    ├── classes/                        # Compiled application classes
+    ├── test-classes/                   # Compiled test classes
+    └── surefire-reports/               # Test execution reports
 ```
 
 ## Technologies Used

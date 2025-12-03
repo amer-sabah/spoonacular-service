@@ -19,8 +19,6 @@ import org.springframework.stereotype.Service;
 @Service
 public class RecipesApiService {
 
-    private static final Logger logger = LoggerFactory.getLogger(RecipesApiService.class);
-
     @Value("${spoonacular.api.key}")
     private String apiKey;
 

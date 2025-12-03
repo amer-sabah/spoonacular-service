@@ -20,8 +20,6 @@ import java.math.BigDecimal;
 @Service
 public class IngredientsApiService {
 
-    private static final Logger logger = LoggerFactory.getLogger(IngredientsApiService.class);
-
     @Value("${spoonacular.api.key}")
     private String apiKey;
 
