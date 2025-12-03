@@ -10,6 +10,8 @@ import com.spoonacular.client.JSON;
 import com.spoonacular.client.model.RecipeInformation;
 import com.spoonacular.client.model.SearchRecipes200Response;
 import com.wiley.spoonacular.cache.JsonFileCache;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +22,8 @@ import java.lang.reflect.Field;
  */
 @Service
 public class RecipesApiService {
+
+    private static final Logger logger = LoggerFactory.getLogger(RecipesApiService.class);
 
     @Value("${spoonacular.api.key}")
     private String apiKey;
@@ -64,7 +68,7 @@ public class RecipesApiService {
                 gsonField.set(json, customGson);
             } catch (Exception e) {
                 // If reflection fails, log warning but continue with default configuration
-                System.err.println("Warning: Could not configure custom Gson: " + e.getMessage());
+                logger.warn("Could not configure custom Gson: {}", e.getMessage(), e);
             }
             
             recipesApi = new RecipesApi(apiClient);

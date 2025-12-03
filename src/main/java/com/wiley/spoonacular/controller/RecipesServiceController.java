@@ -4,6 +4,8 @@ import com.spoonacular.client.ApiException;
 import com.spoonacular.client.model.RecipeInformation;
 import com.spoonacular.client.model.SearchRecipes200Response;
 import com.wiley.spoonacular.service.RecipesApiService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/recipes")
 public class RecipesServiceController {
 
+    private static final Logger logger = LoggerFactory.getLogger(RecipesServiceController.class);
     private final RecipesApiService recipesApiService;
 
     public RecipesServiceController(RecipesApiService recipesApiService) {
@@ -39,6 +42,7 @@ public class RecipesServiceController {
             SearchRecipes200Response response = recipesApiService.searchRecipes(query, maxResultSize, cuisines, maxCalories);
             return ResponseEntity.ok(response);
         } catch (ApiException e) {
+            logger.error("Error searching recipes with query '{}': {}", query, e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Error searching recipes: " + e.getMessage());
         }
@@ -60,6 +64,7 @@ public class RecipesServiceController {
             RecipeInformation recipeInfo = recipesApiService.getRecipeInformation(id, includeNutrition);
             return ResponseEntity.ok(recipeInfo);
         } catch (ApiException e) {
+            logger.error("Error getting recipe information for id {}: {}", id, e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Error getting recipe information: " + e.getMessage());
         }

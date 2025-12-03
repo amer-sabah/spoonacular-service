@@ -9,6 +9,8 @@ import com.spoonacular.client.ApiException;
 import com.spoonacular.client.JSON;
 import com.spoonacular.client.model.IngredientInformation;
 import com.wiley.spoonacular.cache.JsonFileCache;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +22,8 @@ import java.math.BigDecimal;
  */
 @Service
 public class IngredientsApiService {
+
+    private static final Logger logger = LoggerFactory.getLogger(IngredientsApiService.class);
 
     @Value("${spoonacular.api.key}")
     private String apiKey;
@@ -59,7 +63,7 @@ public class IngredientsApiService {
                 gsonField.set(json, customGson);
             } catch (Exception e) {
                 // If reflection fails, log warning but continue with default configuration
-                System.err.println("Warning: Could not configure custom Gson: " + e.getMessage());
+                logger.warn("Could not configure custom Gson: {}", e.getMessage(), e);
             }
             
             ingredientsApi = new IngredientsApi(apiClient);

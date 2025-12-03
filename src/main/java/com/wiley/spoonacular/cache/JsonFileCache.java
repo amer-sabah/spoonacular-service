@@ -3,6 +3,8 @@ package com.wiley.spoonacular.cache;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -21,6 +23,7 @@ import java.util.stream.Stream;
  * File-based JSON cache manager with TTL and size limits.
  */
 public class JsonFileCache<T> {
+    private static final Logger logger = LoggerFactory.getLogger(JsonFileCache.class);
     private static final long DEFAULT_TTL_HOURS = 24;
     private static final int DEFAULT_MAX_ENTRIES = 100;
     
@@ -66,7 +69,7 @@ public class JsonFileCache<T> {
         try {
             Files.createDirectories(Paths.get(cacheDir));
         } catch (IOException e) {
-            System.err.println("Warning: Could not create cache directory: " + e.getMessage());
+            logger.warn("Could not create cache directory: {}", e.getMessage(), e);
         }
     }
 
@@ -128,7 +131,7 @@ public class JsonFileCache<T> {
 
             return entry.getData();
         } catch (IOException e) {
-            System.err.println("Warning: Could not read cache file: " + e.getMessage());
+            logger.warn("Could not read cache file: {}", e.getMessage(), e);
             return null;
         }
     }
@@ -150,7 +153,7 @@ public class JsonFileCache<T> {
             File cacheFile = new File(cacheDir, cacheKey + ".json");
             Files.writeString(cacheFile.toPath(), json);
         } catch (IOException e) {
-            System.err.println("Warning: Could not write cache file: " + e.getMessage());
+            logger.warn("Could not write cache file: {}", e.getMessage(), e);
         }
     }
 
@@ -184,7 +187,7 @@ public class JsonFileCache<T> {
                 }
             }
         } catch (IOException e) {
-            System.err.println("Warning: Could not enforce cache size limit: " + e.getMessage());
+            logger.warn("Could not enforce cache size limit: {}", e.getMessage(), e);
         }
     }
 
@@ -202,7 +205,7 @@ public class JsonFileCache<T> {
                 try {
                     Files.delete(entry.getKey());
                 } catch (IOException e) {
-                    System.err.println("Warning: Could not delete old cache file: " + e.getMessage());
+                    logger.warn("Could not delete old cache file: {}", e.getMessage(), e);
                 }
             });
     }
@@ -221,13 +224,13 @@ public class JsonFileCache<T> {
                              try {
                                  Files.delete(path);
                              } catch (IOException e) {
-                                 System.err.println("Warning: Could not delete cache file: " + e.getMessage());
+                                 logger.warn("Could not delete cache file: {}", e.getMessage(), e);
                              }
                          });
                 }
             }
         } catch (IOException e) {
-            System.err.println("Warning: Could not clear cache: " + e.getMessage());
+            logger.warn("Could not clear cache: {}", e.getMessage(), e);
         }
     }
 }

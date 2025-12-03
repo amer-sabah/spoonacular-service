@@ -3,6 +3,8 @@ package com.wiley.spoonacular.controller;
 import com.spoonacular.client.ApiException;
 import com.spoonacular.client.model.IngredientInformation;
 import com.wiley.spoonacular.service.IngredientsApiService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,6 +15,7 @@ import java.math.BigDecimal;
 @RequestMapping("/ingredients")
 public class IngredientsServiceController {
 
+    private static final Logger logger = LoggerFactory.getLogger(IngredientsServiceController.class);
     private final IngredientsApiService ingredientsApiService;
 
     public IngredientsServiceController(IngredientsApiService ingredientsApiService) {
@@ -37,6 +40,7 @@ public class IngredientsServiceController {
             IngredientInformation ingredientInfo = ingredientsApiService.getIngredientInformation(id, amount, unit);
             return ResponseEntity.ok(ingredientInfo);
         } catch (ApiException e) {
+            logger.error("Error getting ingredient information for id {}: {}", id, e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Error getting ingredient information: " + e.getMessage());
         }
